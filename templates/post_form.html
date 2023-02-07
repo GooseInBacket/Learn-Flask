@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+  <h1>Успех!</h1>
+  <p>Username: {{ username }}</p>
+  <p>Password: {{ password }}</p>
+  <p>Remember me:
+  {% if remember == "y" %}
+    Да
+  {% else %}
+    Нет
+  {% endif %}
+  </p>
+</div>
+{% endblock %}

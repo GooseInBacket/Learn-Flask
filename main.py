@@ -1,139 +1,70 @@
-from flask import Flask, url_for, request
+import os
+
+from flask import Flask, render_template, url_for, request
+from forms import LoginForm
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 @app.route('/')
 def index():
-    """ Создание эндпоинта """
+    return render_template('index.html', title='Домашняя страница')
 
-    return 'Привет, Яндекс'
+@app.route('/index')
+def more_index():
+    params = dict()
+    params['username'] = 'Яндексоид комнатный'
+    params['title'] = 'Домашняя страница!'
+    return render_template('index.html', **params)
 
+@app.route('/conditions')
+def conditions():
+    params = dict()
+    params['title'] = 'Условия'
+    params['number'] = 2
+    return render_template('conditions.html', **params)
 
-@app.route('/countdown')
-def countdown():
-    """ Еще эндпоинт """
+@app.route('/cycles')
+def cycles():
+    params = dict()
+    params['title'] = 'Циклы'
+    params['users'] = ['Егор', 'Егор', 'Шьям', 'Андрей', 'Даня']
+    params['pic'] = url_for('.static', filename='/img/pic.png')
+    return render_template('cycles.html', **params)
 
-    return '</br>'.join([str(i) for i in range(10, 0, -1)] + ['Пуск'])
+@app.route('/base')
+def base():
+    params = dict()
+    params['title'] = 'Наследование шаблонов'
+    params['css'] = url_for('.static', filename='/css/base_style.css')
+    return render_template('base.html', **params)
 
+@app.route('/inner')
+def inner():
+    params = dict()
+    params['title'] = 'Наследование шаблонов'
+    params['css'] = url_for('.static', filename='/css/base_style.css')
+    return render_template('inner.html', **params)
 
-@app.route('/img')
-def image():
-    """ Вывод статичных файлов """
-
-    html = '''<img src="{0}" alt="{1}">'''
-    return html.format(url_for('.static', filename='/img/riana.jpeg'), 'если картинки нет')
-
-
-@app.route('/sample_page')
-def return_sample_page():
-    """ Вывод html-кода """
-
-    html = """<!doctype html>
-                <html lang="en">
-                  <head>
-                    <meta charset="utf-8">
-                    <title>Привет, Яндекс!</title>
-                    <link rel="stylesheet" href="{0}">
-                  </head>
-                  <body>
-                    <h1>Первая HTML-страница</h1>
-                  </body>
-                </html>"""
-    return html.format(url_for('.static', filename='/css/style.css'))
-
-
-@app.route('/greet/<username>')
-def greet(username):
-    """ Передача параметров """
-
-    return f""" Hello {username}! """
-
-
-@app.route('/two_params/<username>/<int:number>')
-def two_params(username, number):
-    """ Передача двух параметров """
-
-    html = f'{username} -> {str(type(username))[1:-1]} <br> {number} -> {str(type(number))[1:-1]}'
-    return html
-
-
-@app.route('/form_sample', methods=['POST', 'GET'])
-def form_sample():
-    """ Создание формы """
-
+@app.route('/forms', methods=['GET', 'POST'])
+def forms():
     if request.method == 'GET':
-        return f'''<!doctype html>
-                        <html lang="en">
-                          <head>
-                            <meta charset="utf-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                            <link rel="stylesheet"
-                            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
-                            integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
-                            crossorigin="anonymous">
-                            <link rel="stylesheet" type="text/css" href="{url_for('static', filename='css/style.css')}" />
-                            <title>Пример формы</title>
-                          </head>
-                          <body>
-                            <h1>Форма для регистрации в суперсекретной системе</h1>
-                            <div>
-                                <form class="login_form" method="post">
-                                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Введите адрес почты" name="email">
-                                    <input type="password" class="form-control" id="password" placeholder="Введите пароль" name="password">
-                                    <div class="form-group">
-                                        <label for="classSelect">В каком вы классе</label>
-                                        <select class="form-control" id="classSelect" name="class">
-                                          <option>7</option>
-                                          <option>8</option>
-                                          <option>9</option>
-                                          <option>10</option>
-                                          <option>11</option>
-                                        </select>
-                                     </div>
-                                    <div class="form-group">
-                                        <label for="about">Немного о себе</label>
-                                        <textarea class="form-control" id="about" rows="3" name="about"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="photo">Приложите фотографию</label>
-                                        <input type="file" class="form-control-file" id="photo" name="file">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="form-check">Укажите пол</label>
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="radio" name="sex" id="male" value="male" checked>
-                                          <label class="form-check-label" for="male">
-                                            Мужской
-                                          </label>
-                                        </div>
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="radio" name="sex" id="female" value="female">
-                                          <label class="form-check-label" for="female">
-                                            Женский
-                                          </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group form-check">
-                                        <input type="checkbox" class="form-check-input" id="acceptRules" name="accept">
-                                        <label class="form-check-label" for="acceptRules">Готов быть добровольцем</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Записаться</button>
-                                </form>
-                            </div>
-                          </body>
-                        </html>'''
-    elif request.method == 'POST':
-        print(request.form['email'])
-        print(request.form['password'])
-        print(request.form['class'])
-        print(request.form['file'])
-        print(request.form['about'])
-        print(request.form['accept'])
-        print(request.form['sex'])
-        return "Форма отправлена"
+        params = dict()
+        params['title'] = 'Работа с формами'
+        params['css'] = url_for('.static', filename='/css/base_style.css')
+        params['form'] = LoginForm()
 
+        return render_template('forms.html', **params)
+    elif request.method == 'POST':
+        params = dict()
+        params['title'] = 'Работа с формами'
+        params['css'] = url_for('.static', filename='/css/base_style.css')
+
+        params['username'] = request.form.get('username')
+        params['password'] = hash(request.form.get('password'))
+        params['remember'] = request.form.get('remember_me')
+
+        return render_template('post_form.html', **params)
 
 if __name__ == '__main__':
-    """ Запуск приложения """
-
-    app.run(port=8000, host='127.0.0.1', debug=True)
+    app.run(port=8000, host='127.0.0.1', debug=True, load_dotenv=True)
